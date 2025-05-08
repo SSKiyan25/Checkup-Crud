@@ -84,6 +84,6 @@ class ReportController extends Controller
             $data = $query->get()->groupBy('coronavirus_status')->map->count();
         }
 
-        return view('reports.awareness', compact('data', 'cities', 'brgys'));
+        return view('reports.coronavirus', compact('data', 'cities', 'brgys'));
     }
 }
