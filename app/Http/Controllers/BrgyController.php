@@ -8,6 +8,8 @@ use App\Models\City;
 use App\Http\Requests\BrgyRequest;
 use App\Http\Resources\BrgyResource;
 use App\Http\Resources\CityResource;
+use Illuminate\Support\Facades\Log;
+
 
 class BrgyController extends Controller
 {
@@ -31,12 +33,16 @@ class BrgyController extends Controller
 
     public function store(BrgyRequest $request)
     {
-        // Before it will get added to the database, it will validate the data requested first
-        // The validation file is located in app/Http/Requests/BrgyRequest.php
-        $data = $request->validated();
-
-        $newBrgy = Brgy::create($data);
-        return redirect()->route('brgys.index')->with('success', 'Barangay ' . $newBrgy['name'] . ' created successfully.');
+        try {
+            // Before it will get added to the database, it will validate the data requested first
+            // The validation file is located in app/Http/Requests/BrgyRequest.php
+            $data = $request->validated();
+            $newBrgy = Brgy::create($data);
+            return redirect()->route('brgys.index')->with('success', 'Barangay ' . $newBrgy['name'] . ' created successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error creating Barangay: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to create Barangay. Please try again.');
+        }
     }
 
     // This method is used to display the details of a specific Barangay viewed/selected by the user in the Brgys Table index page
@@ -55,17 +61,26 @@ class BrgyController extends Controller
 
     public function update(Brgy $brgy, BrgyRequest $request)
     {
-        // Before it will get updated in the database, it will validate the data requested first
-        // It follows the same validation rules as the store method
-        $data = $request->validated();
-
-        $brgy->update($data);
-        return redirect()->route('brgys.index')->with('success', 'Barangay updated successfully.');
+        try {
+            // Before it will get updated in the database, it will validate the data requested first
+            // It follows the same validation rules as the store method
+            $data = $request->validated();
+            $brgy->update($data);
+            return redirect()->route('brgys.index')->with('success', 'Barangay updated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error updating Barangay: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update Barangay. Please try again.');
+        }
     }
 
     public function destroy(Brgy $brgy)
     {
-        $brgy->delete();
-        return redirect()->route('brgys.index')->with('success', 'Barangay deleted successfully.');
+        try{
+            $brgy->delete();
+            return redirect()->route('brgys.index')->with('success', 'Barangay deleted successfully.');
+        } catch( \Exception $e) {
+            Log::error('Error deleting Barangay: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete Barangay. Please try again.');
+        }
     }
 }

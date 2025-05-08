@@ -9,6 +9,7 @@ use App\Http\Requests\PatientRequest;
 use App\Models\Brgy;
 use App\Notifications\CaseTypeUpdated;
 use App\Http\Resources\BrgyResource;
+use Illuminate\Support\Facades\Log;
 
 class PatientController extends Controller
 {
@@ -30,12 +31,17 @@ class PatientController extends Controller
 
     public function store(PatientRequest $request)
     {
-        // Before it will get added to the database, it will validate the data requested first
-        // The validation file is located in app/Http/Requests/PatientRequest.php
-        $data = $request->validated();
+        try {
+             // Before it will get added to the database, it will validate the data requested first
+            // The validation file is located in app/Http/Requests/PatientRequest.php
+            $data = $request->validated();
 
-        $newPatient = Patient::create($data);
-        return redirect()->route('patients.index')->with('success', 'Patient ' . $newPatient['name'] . ' created successfully.');
+            $newPatient = Patient::create($data);
+            return redirect()->route('patients.index')->with('success', 'Patient ' . $newPatient['name'] . ' created successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error creating Patient: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to create Patient. Please try again.');
+        }
     }
 
     public function show(Patient $patient)
@@ -52,35 +58,45 @@ class PatientController extends Controller
 
     public function update(Patient $patient, PatientRequest $request)
     {
-        $data = $request->validated();
+        try {
+            $data = $request->validated();
 
-        // Check if the patient's case type has changed
-        $oldCaseType = $patient->case_type;
-        $newCaseType = $data['case_type'];
-
-        if ($oldCaseType !== $newCaseType) {
-            $patient->update($data);
-
-            // Check if the patient has an email
-            if ($patient->email) {
-                // Send the email notification upon validated
-                $patient->notify(new CaseTypeUpdated($patient, $oldCaseType, $newCaseType));
-                $message = 'Patient updated successfully, and notification email sent. If you do not see the email, please check your spam folder.';
+            // Check if the patient's case type has changed
+            $oldCaseType = $patient->case_type;
+            $newCaseType = $data['case_type'];
+    
+            if ($oldCaseType !== $newCaseType) {
+                $patient->update($data);
+    
+                // Check if the patient has an email
+                if ($patient->email) {
+                    // Send the email notification upon validated
+                    $patient->notify(new CaseTypeUpdated($patient, $oldCaseType, $newCaseType));
+                    $message = 'Patient updated successfully, and notification email sent. If you do not see the email, please check your spam folder.';
+                } else {
+                    $message = 'Patient updated successfully, but no email was sent as the patient does not have an email address.';
+                }   
             } else {
-                $message = 'Patient updated successfully, but no email was sent as the patient does not have an email address.';
-            }   
-        } else {
-            $patient->update($data);
-            $message = 'Patient updated successfully.';
+                $patient->update($data);
+                $message = 'Patient updated successfully.';
+            }
+    
+            return redirect()->route('patients.index')->with('success', $message);
+        } catch (\Exception $e) {
+            Log::error('Error updating Patient: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update Patient. Please try again.');
         }
-
-        return redirect()->route('patients.index')->with('success', $message);
     }
 
     public function destroy(Patient $patient)
     {
-        $patient->delete();
-        return redirect()->route('patients.index')->with('success', 'Patient deleted successfully.');
+        try {
+            $patient->delete();
+            return redirect()->route('patients.index')->with('success', 'Patient deleted successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error deleting Patient: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete Patient. Please try again.');
+        }
     }
 
     // This method is used to pass the patients data to the check status page
