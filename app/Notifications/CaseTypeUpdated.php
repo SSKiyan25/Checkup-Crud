@@ -37,6 +37,8 @@ class CaseTypeUpdated extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        // This will be sent based on the patient's email
+        // If can't be seen in the inbox, check the spam folder
         return (new MailMessage)
             ->subject('Your Case Type Has Been Updated')
             ->greeting('Hello ' . $this->patient->name . ',')

@@ -63,7 +63,7 @@ class PatientController extends Controller
             if ($patient->email) {
                 // Send the email notification upon validated
                 $patient->notify(new CaseTypeUpdated($patient, $oldCaseType, $newCaseType));
-                $message = 'Patient updated successfully, and notification email sent.';
+                $message = 'Patient updated successfully, and notification email sent. If you do not see the email, please check your spam folder.';
             } else {
                 $message = 'Patient updated successfully, but no email was sent as the patient does not have an email address.';
             }
