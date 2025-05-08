@@ -7,6 +7,7 @@ use App\Models\Brgy;
 use App\Models\City;
 use App\Http\Requests\BrgyRequest;
 use App\Http\Resources\BrgyResource;
+use App\Http\Resources\CityResource;
 
 class BrgyController extends Controller
 {
@@ -22,9 +23,10 @@ class BrgyController extends Controller
     // This method is used to display a list of all Baranggays to populate the dropdown selection values in the create page
     public function create()
     {
-        // Fetch all cities to populate the dropdown selection
+        // Fetch all cities to populate the dropdown selection values
         $cities = City::with('brgys')->get();
-        return view('brgys.create', ['cities' => $cities]);
+        $cityResource = CityResource::collection($cities);
+        return view('brgys.create', ['cities' => $cityResource]);
     }
 
     public function store(BrgyRequest $request)

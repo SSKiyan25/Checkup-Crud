@@ -8,6 +8,7 @@ use App\Http\Resources\PatientResource;
 use App\Http\Requests\PatientRequest;
 use App\Models\Brgy;
 use App\Notifications\CaseTypeUpdated;
+use App\Http\Resources\BrgyResource;
 
 class PatientController extends Controller
 {
@@ -23,7 +24,8 @@ class PatientController extends Controller
     public function create()
     {
         $brgys = Brgy::with('city')->get();
-        return view('patients.create', ['brgys' => $brgys]);
+        $brgysResource = BrgyResource::collection($brgys);
+        return view('patients.create', ['brgys' => $brgysResource]);
     }
 
     public function store(PatientRequest $request)
@@ -66,7 +68,7 @@ class PatientController extends Controller
                 $message = 'Patient updated successfully, and notification email sent. If you do not see the email, please check your spam folder.';
             } else {
                 $message = 'Patient updated successfully, but no email was sent as the patient does not have an email address.';
-            }
+            }   
         } else {
             $patient->update($data);
             $message = 'Patient updated successfully.';

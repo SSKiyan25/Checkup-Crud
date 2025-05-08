@@ -28,6 +28,8 @@
                 <input type="text" name="name" placeholder="Name" value="{{ $patient->name }}" required>
                 <br />
                 <label>Brgy</label>
+                <!-- Assuming that the user can select a barangay outside the city they were part with based on the current brgy. -->
+                <!-- Then display all brgys existed -->
                 <select name="brgy_id" id="brgy_id">
                     <option value="" disabled selected>Select Brgy</option>
                     @foreach ($brgys as $brgy)

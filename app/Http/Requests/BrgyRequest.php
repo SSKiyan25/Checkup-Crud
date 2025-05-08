@@ -26,9 +26,12 @@ class BrgyRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                Rule::unique('brgys')->ignore(request()->route('brgy'))->where(function ($query) {
-                    return $query->where('name', request()->name);
-                }),
+                // Allows the same brgy name in different cities, otherwise if same city it should be unique
+                Rule::unique('brgys')
+                ->where(function ($query) {
+                    return $query->where('city_id', request()->city_id);
+                })
+                ->ignore(request()->route('brgy')), 
             ],
             'city_id' => [
                 'required',
@@ -43,7 +46,7 @@ class BrgyRequest extends FormRequest
         return [
             'name.required' => 'Barangay name is required.',
             'name.string' => 'Barangay name must be a string.',
-            'name.unique' => 'Barangay name already exists.',
+            'name.unique' => 'Barangay name already exists in this city.',
             'city_id.required' => 'Must select a city.',
             'city_id.exists' => 'City ID must exist in the cities table.',
         ];
