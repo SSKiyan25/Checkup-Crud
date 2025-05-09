@@ -40,17 +40,21 @@ class ReportController extends Controller
             'Negative on Covid' => 0,
         ];
 
-        // If the user selected a city and barangay, it will populate the data based on the selected barangay and city
-        if ($request->city_id && $request->brgy_id) {
+        // If the user selected a city or barangay, populate the data
+        if ($request->city_id) {
             $query = Patient::query();
 
+            // Filter by city if city_id is provided
             $query->whereHas('brgy', function ($q) use ($request) {
                 $q->where('city_id', $request->city_id);
             });
 
-            $query->where('brgy_id', $request->brgy_id);
+            // Filter by barangay if brgy_id is provided
+            if ($request->brgy_id) {
+                $query->where('brgy_id', $request->brgy_id);
+            }
 
-            // Counts the number of patients based on their case type
+            // Count the number of patients based on their case type
             $data = $query->get()->groupBy('case_type')->map->count();
         }
 
@@ -70,17 +74,21 @@ class ReportController extends Controller
             'Negative on Covid' => 0,
         ];
 
-        // If the user selected a city and barangay, it will populate the data based on the selected barangay and city
-        if ($request->city_id && $request->brgy_id) {
+        // If the user selected a city or barangay, populate the data
+        if ($request->city_id) {
             $query = Patient::query();
 
+            // Filter by city if city_id is provided
             $query->whereHas('brgy', function ($q) use ($request) {
                 $q->where('city_id', $request->city_id);
             });
 
-            $query->where('brgy_id', $request->brgy_id);
+            // Filter by barangay if brgy_id is provided
+            if ($request->brgy_id) {
+                $query->where('brgy_id', $request->brgy_id);
+            }
 
-            // Counts the number of patients based on their coronavirus status
+            // Count the number of patients based on their coronavirus status
             $data = $query->get()->groupBy('coronavirus_status')->map->count();
         }
 

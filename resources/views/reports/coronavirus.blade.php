@@ -58,7 +58,7 @@
         </div>
         <div>
             <label for="brgy_id">Select Barangay:</label>
-            <select name="brgy_id" id="brgy_id" required>
+            <select name="brgy_id" id="brgy_id">
                 <option value="" disabled selected>Select Barangay</option>
                 @if (request('city_id'))
                     @foreach ($brgys->where('city_id', request('city_id')) as $brgy)
