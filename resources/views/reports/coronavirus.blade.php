@@ -6,6 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Coronavirus Report</title>
+    <!-- This script dynamically updates the barangay options in the select tag -->
+    <!-- It ensures that only barangays belonging to the selected city are displayed to avoid confusions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const citySelect = document.getElementById('city_id');
+            const brgySelect = document.getElementById('brgy_id');
+
+            citySelect.addEventListener('change', function() {
+                const cityId = this.value;
+                brgySelect.innerHTML = '<option value="" disabled selected>Loading...</option>';
+
+                if (cityId) {
+                    fetch(`{{ route('get-brgys-by-city') }}?city_id=${cityId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch barangays');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            let options = '<option value="" disabled selected>Select Barangay</option>';
+                            data.forEach(brgy => {
+                                options += `<option value="${brgy.id}">${brgy.name}</option>`;
+                            });
+                            brgySelect.innerHTML = options;
+                        })
+                        .catch(error => {
+                            alert('Failed to fetch barangays. Please try again.');
+                            console.error(error);
+                        });
+                }
+            });
+        });
+    </script>
 </head>
 
 <body>
@@ -34,6 +68,10 @@
                     @endforeach
                 @endif
             </select>
+            <p>
+                Select a city first to load the barangays. The barangay list will be populated based on the selected
+                city.
+            </p>
         </div>
         <div>
             <button type="submit">Generate Report</button>
@@ -89,41 +127,6 @@
             <a href="{{ route('check-status.index') }}"> Check Patient's Status</a>
         </div>
     </div>
-
-    <!-- This script dynamically updates the barangay options in the select tag -->
-    <!-- It ensures that only barangays belonging to the selected city are displayed to avoid confusions -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const citySelect = document.getElementById('city_id');
-            const brgySelect = document.getElementById('brgy_id');
-
-            citySelect.addEventListener('change', function() {
-                const cityId = this.value;
-                brgySelect.innerHTML = '<option value="" disabled selected>Loading...</option>';
-
-                if (cityId) {
-                    fetch(`{{ route('get-brgys-by-city') }}?city_id=${cityId}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch barangays');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            let options = '<option value="" disabled selected>Select Barangay</option>';
-                            data.forEach(brgy => {
-                                options += `<option value="${brgy.id}">${brgy.name}</option>`;
-                            });
-                            brgySelect.innerHTML = options;
-                        })
-                        .catch(error => {
-                            alert('Failed to fetch barangays. Please try again.');
-                            console.error(error);
-                        });
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>

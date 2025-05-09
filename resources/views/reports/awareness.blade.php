@@ -68,6 +68,10 @@
                     @endforeach
                 @endif
             </select>
+            <p>
+                Select a city first to load the barangays. The barangay list will be populated based on the selected
+                city.
+            </p>
         </div>
         <div>
             <button type="submit">Generate Report</button>
